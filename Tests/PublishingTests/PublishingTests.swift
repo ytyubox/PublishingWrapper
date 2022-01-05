@@ -17,6 +17,14 @@ final class PublishingTests: XCTestCase {
         sut.set(to: &target)
         XCTAssertEqual(spy, 1)
         XCTAssertEqual(target, 1)
+        var history: [Int] = []
+        let cancelable = sut.$i.sink { value in
+            history.append(value)
+        }
+        sut.set(2)
+        XCTAssertEqual(spy, 2)
+        XCTAssertEqual(history, [1,2])
+        cancelable.cancel()
     }
 }
 
@@ -24,5 +32,8 @@ private struct TestingView {
     @Binded var i: Int
     func set(to int: inout Int) {
         int = i
+    }
+    func set(_ newValue:Int) {
+        i = newValue
     }
 }
