@@ -1,11 +1,12 @@
-import XCTest
 @testable import Publishing
-
+import XCTest
 final class PublishingTests: XCTestCase {
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(Publishing().text, "Hello, World!")
+    func testPublishingAsInside() throws {
+        @Publishing var sut = 1
+        var history: [String] = []
+        let cancelable = $sut.sink { history.append("sink \($0)") }
+        sut += 1
+        XCTAssertEqual(history, ["sink 1", "sink 2"])
+        cancelable.cancel()
     }
 }
