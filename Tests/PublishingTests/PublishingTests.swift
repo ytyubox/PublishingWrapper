@@ -9,4 +9,20 @@ final class PublishingTests: XCTestCase {
         XCTAssertEqual(history, ["sink 1", "sink 2"])
         cancelable.cancel()
     }
+
+    func testCanInjectProjectValue() throws {
+        @Publishing var spy = 1
+        let sut = TestingView(i: $spy)
+        var target = 0
+        sut.set(to: &target)
+        XCTAssertEqual(spy, 1)
+        XCTAssertEqual(target, 1)
+    }
+}
+
+private struct TestingView {
+    @Binded var i: Int
+    func set(to int: inout Int) {
+        int = i
+    }
 }

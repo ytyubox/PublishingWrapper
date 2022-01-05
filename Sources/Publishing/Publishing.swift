@@ -18,31 +18,24 @@ public struct Publishing<Value> {
         set { _publisher.value[keyPath: keyPath] = newValue }
     }
 
-    public var projectedValue: Binding<Value> {
-        Binding(subject: _publisher)
+    public var projectedValue: Binded<Value> {
+        Binded(subject: _publisher)
     }
 }
 
 @propertyWrapper
-public struct Binding<Value>: Publisher {
-    public func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, Value == S.Input {
-        _publisher.subscribe(subscriber)
-    }
-
-    public typealias Output = Value
-
-    public typealias Failure = Never
-
+public struct Binded<Value> {
     private let _publisher: CurrentValueSubject<Value, Never>!
-    public init(subject: CurrentValueSubject<Value, Never>) {
+
+    init(subject: CurrentValueSubject<Value, Never>) {
         _publisher = subject
     }
 
-    public init(wrappedValue _: Value) {
-        fatalError()
+    public init(projectedValue: Binded<Value>) {
+        self = projectedValue
     }
 
-    public var projectedValue: Binding<Value> {
+    public var projectedValue: Binded<Value> {
         return self
     }
 
@@ -50,4 +43,14 @@ public struct Binding<Value>: Publisher {
         get { _publisher.value }
         nonmutating set { _publisher.value = newValue }
     }
+}
+
+extension Binded: Publisher {
+    public func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, Value == S.Input {
+        _publisher.subscribe(subscriber)
+    }
+
+    public typealias Output = Value
+
+    public typealias Failure = Never
 }
